@@ -1,0 +1,45 @@
+---
+title: "HW1"
+author: "Blake Kell"
+format: html
+editor: visual
+---
+
+## Quarto
+
+Quarto enables you to weave together content and executable code into a finished document. To learn more about Quarto see <https://quarto.org>.
+
+## Running Code
+
+When you click the **Render** button a document will be generated that includes both content and the output of embedded code. You can embed code like this:
+
+```{r}
+library(tidyverse)
+```
+
+
+```{r}
+exped_tidy <- readr::read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/main/data/2025/2025-01-21/exped_tidy.csv')
+peaks_tidy <- readr::read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/main/data/2025/2025-01-21/peaks_tidy.csv')
+```
+
+You can add options to executable code like this
+
+```{r}
+
+routes <- exped_tidy %>% 
+  select(ROUTE1,SUCCESS1)
+
+routes
+r <- routes %>%
+  group_by(ROUTE1,SUCCESS1) %>%
+  count() %>%
+  pivot_wider(names_from = SUCCESS1, values_from = n, values_fill = 0) %>%
+  pivot_longer(cols = c(`FALSE`,`TRUE`),names_to = "Type", values_to = "Count")
+
+
+ggplot(r,aes(x = ROUTE1, y = Count, fill = Type)) +
+ geom_bar(stat = 'identity')
+```
+
+The `echo: false` option disables the printing of code (only output is displayed).
