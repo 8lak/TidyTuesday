@@ -1,0 +1,49 @@
+---
+title: "2025-03-18_TidyTuesday"
+format: html
+editor: visual
+---
+
+## Quarto
+
+Quarto enables you to weave together content and executable code into a finished document. To learn more about Quarto see <https://quarto.org>.
+
+## Running Code
+
+When you click the **Render** button a document will be generated that includes both content and the output of embedded code. You can embed code like this:
+
+```{r error=FALSE,warning=FALSE}
+library(tidytuesdayR)
+library(ggplot2)
+library(dplyr)
+```
+
+
+```{r}
+tuesdata <- tidytuesdayR::tt_load('2025-03-18')
+
+palmtrees <- tuesdata$palmtrees
+
+```
+
+You can add options to executable code like this
+
+```{r error=FALSE,warning=FALSE}
+p <- palmtrees %>%
+  filter(!is.na(fruit_size_categorical), !is.na(palm_subfamily)) %>%
+  group_by(palm_subfamily,fruit_size_categorical) %>%
+  summarise(count = n(), .groups = "drop") %>%
+  ggplot(aes(x = reorder(palm_subfamily, -count), y = count, fill = fruit_size_categorical)) +
+  geom_col(position = "stack") +
+  labs(
+    title = "Fruit Size Distribution by Subfamily and Canopy Position",
+    x = "Palm Subfamily",
+    y = "Count",
+    fill = "Fruit Size Category"
+  ) +
+  theme_minimal()
+
+ggsave("2025-03-18_TidyTuesday.png", plot = p, width = 10, height = 6, dpi = 300)
+```
+
+The `echo: false` option disables the printing of code (only output is displayed).

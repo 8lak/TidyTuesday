@@ -1,0 +1,61 @@
+---
+title: "HW1"
+author: "Blake Kell"
+format: html
+editor: visual
+---
+
+## Quarto
+
+Quarto enables you to weave together content and executable code into a finished document. To learn more about Quarto see <https://quarto.org>.
+
+## Running Code
+
+When you click the **Render** button a document will be generated that includes both content and the output of embedded code. You can embed code like this:
+
+```{r}
+library(tidyverse)
+```
+
+```{r}
+exped_tidy <- readr::read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/main/data/2025/2025-01-21/exped_tidy.csv')
+peaks_tidy <- readr::read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/main/data/2025/2025-01-21/peaks_tidy.csv')
+```
+
+You can add options to executable code like this
+
+```{r}
+
+routes <- exped_tidy %>% 
+  select(PEAKID,SUCCESS1)
+
+r <- routes %>%
+  group_by(PEAKID) %>% 
+  count(SUCCESS1) %>% 
+  pivot_wider(names_from = SUCCESS1, values_from = n, values_fill = 1) %>%
+  mutate(SUCCESSRATIO = `TRUE` / `FALSE`)
+
+
+times <- peaks_tidy %>% 
+  select(PEAKID, PYEAR) %>% 
+  drop_na()
+
+
+final_data <- r %>%
+  inner_join(times, by = "PEAKID") %>% 
+  select(!c(`TRUE`,`FALSE`))
+
+
+ggplot(final_data,aes(x = PYEAR, y = SUCCESSRATIO)) +
+  geom_line()+
+  geom_smooth(method = "lm", se = FALSE, color = "blue") +  # Add trend line
+  labs(
+    title = "Success Ratio vs. First Attempt Year",
+    subtitle = "Analyzing the relationship between first attempt year and expedition success",
+    x = "First Attempt Year (PYEAR)",
+    y = "Success Ratio"
+  ) +
+  theme_minimal()
+```
+
+The `echo: false` option disables the printing of code (only output is displayed).
