@@ -1,0 +1,71 @@
+---
+title: "2025-03-11_TidyTuesday"
+format: html
+editor: visual
+---
+
+## Quarto
+
+Quarto enables you to weave together content and executable code into a finished document. To learn more about Quarto see <https://quarto.org>.
+
+## Running Code
+
+When you click the **Render** button a document will be generated that includes both content and the output of embedded code. You can embed code like this:
+```{r warning=FALSE,error=FALSE}
+library(tidytuesdayR)
+library(tidyverse)
+```
+
+
+```{r}
+
+
+tuesdata <- tidytuesdayR::tt_load('2025-03-11')
+
+pixar_films <- tuesdata$pixar_films
+public_response <- tuesdata$public_response
+
+```
+
+You can add options to executable code like this
+
+```{r}
+pixar_joined <- left_join(pixar_films, public_response, by = "film")
+
+pixar_clean <- pixar_joined %>%
+  filter(!is.na(run_time), !is.na(rotten_tomatoes))
+
+pixar_binned <- pixar_clean %>%
+  mutate(
+    runtime_bin = cut(run_time,
+                      breaks = c(0, 79, 89, 99, Inf),
+                      labels = c("<80 min", "80–89 min", "90–99 min", "100+ min")),
+    rating_group = case_when(
+      rotten_tomatoes >= 90 ~ "90+",
+      rotten_tomatoes >= 75 ~ "75–89",
+      rotten_tomatoes >= 60 ~ "60–74",
+      TRUE ~ "<60"
+    )
+    ,rating_group = factor(rating_group, levels = c("90+", "75–89", "60–74", "<60"))
+  )
+
+```
+
+
+```{r}
+
+p <- ggplot(pixar_binned, aes(x = runtime_bin, fill = rating_group)) +
+  geom_bar(position = "stack") +
+  labs(
+    title = "Distribution of Pixar Film Runtimes by Rotten Tomatoes Rating",
+    x = "Run Time Bin",
+    y = "Number of Films",
+    fill = "Rating Group"
+  ) +
+  theme_minimal()
+
+
+ggsave("2025-03-11_TidyTuesday.png", plot = p, width = 10, height = 6, dpi = 300,bg = "white")
+```
+
+The `echo: false` option disables the printing of code (only output is displayed).
