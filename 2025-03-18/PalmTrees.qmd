@@ -43,7 +43,7 @@ p <- palmtrees %>%
   ) +
   theme_minimal()
 
-ggsave("2025-03-18_TidyTuesday.png", plot = p, width = 10, height = 6, dpi = 300)
+ggsave("2025-03-18_TidyTuesday.png", plot = p, width = 10, height = 6, dpi = 300,bg = "white")
 ```
 
 The `echo: false` option disables the printing of code (only output is displayed).
